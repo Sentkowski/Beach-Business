@@ -1,0 +1,69 @@
+.App-grid {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 15vh 1fr 1fr 1fr;
+  grid-template-areas: 
+    'nav   nav    nav'
+    'chart chart  ranking'
+    'turns button ranking'
+    'beach beach  beach';
+}
+
+.nav-belt {
+  background-color: #2EC4B6;
+  grid-area: nav;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.belt-red-circle {
+  z-index: 1;
+  position: relative;
+  top: -7.5vh;
+  background-color: #FF6666;
+  width: 15vh;
+  height: 15vh;
+  border-radius: 100%;
+}
+
+.belt-white-circle {
+  position: absolute;
+  top: -10vh;
+  background-color: white;
+  width: 20vh;
+  height: 20vh;
+  border-radius: 100%;
+}
+
+.ranking-container {
+  grid-area: ranking;
+  margin: 10% 15%;
+  border: 3px solid #FF6666;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.ranking-me, .ranking-others {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 15%;
+  width: 75%;
+  border-radius: 20px;
+  color: white;
+  font-size: 24px;
+}
+
+.ranking-me {
+  background-color: #FF6666;
+}
+
+.ranking-others {
+  background-color: #2EC4B6;
+}
