@@ -60,10 +60,105 @@
   font-size: 24px;
 }
 
-.ranking-me {
+.ranking-others {
   background-color: #FF6666;
 }
 
-.ranking-others {
+.ranking-me {
   background-color: #2EC4B6;
+}
+
+.turn-overview {
+  overflow-x: auto;
+  grid-area: turns;
+  border: 3px solid #FF6666;
+  border-radius: 20px;
+  margin: 5% 5%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 24px;
+  color: #FF6666; 
+}
+
+.shop-name-blue {
+  color: #2EC4B6;
+}
+
+.player-turn-container {
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.turn-button {
+  align-self: center;
+  justify-self: center;
+  height: 30%;
+  width: 60%;
+  grid-area: button;
+  background-color: #FF6666;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 24px;
+  box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+
+.turn-button:disabled {
+  cursor: auto;
+  box-shadow: none;
+  background-color: #FF666688;
+}
+
+.chart {
+  grid-area: chart;
+  border: 3px solid #FF6666;
+  border-radius: 20px;
+  margin: 5% 0% 0% 2.5%;
+}
+
+.beach-container {
+  position: relative;
+  grid-area: beach;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.sector {
+  display: flex;
+  cursor: pointer;
+  height: 150px;
+  width: 150px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 24px;
+  color: #2EC4B6;
+  background-color: white;
+  border: 3px solid #2EC4B6;
+  border-radius: 20px;
+  padding: 10px;
+  box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5);
+}
+
+.beach-image {
+  width: 100%;
+  position: absolute;
+  top: -2%;
+}
+
+.sector.players {
+  background-color: #2EC4B6;
+  color: white;
+}
+
+.sector.computers {
+  background-color: #FF6666;
+  border-color: #FF6666;
+  color: white;
 }
