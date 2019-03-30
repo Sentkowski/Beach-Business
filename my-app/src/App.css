@@ -1,4 +1,5 @@
 .App-grid {
+  overflow: hidden;
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -58,6 +59,7 @@
   border-radius: 20px;
   color: white;
   font-size: 24px;
+  font-weight: bold;
 }
 
 .ranking-others {
@@ -78,6 +80,7 @@
   justify-content: space-around;
   align-items: center;
   font-size: 24px;
+  font-weight: bold;
   color: #FF6666; 
 }
 
@@ -86,6 +89,7 @@
 }
 
 .player-turn-container {
+  position: relative;
   height: 70%;
   display: flex;
   flex-direction: column;
@@ -146,6 +150,10 @@
   box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5);
 }
 
+.sector p, .sector img {
+  pointer-events: none;
+}
+
 .beach-image {
   width: 100%;
   position: absolute;
@@ -161,4 +169,73 @@
   background-color: #FF6666;
   border-color: #FF6666;
   color: white;
+}
+
+.placed-shop-number {
+  position: absolute;
+  top: 40%;
+  font-size: 62px;
+}
+
+.placed-shop-image {
+  opacity: 0.25;
+}
+
+@media only screen and (max-width: 925px) {
+  .App-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 10vh 1fr 1fr 10vh 1fr;
+    grid-template-areas: 
+      'nav     nav'
+      'turns   turns'
+      'ranking chart'
+      'button  button'
+      'beach   beach';
+    min-height: 500px;
+  }
+
+  .turn-button {
+    width: 300px;
+    height: 6vh;
+  }
+
+  .ranking-container {
+    margin: 10px;
+    position: relative;
+  }
+
+  .ranking-me, .ranking-others {
+    height: 25%;
+  }
+
+  .chart {
+    margin: 10px;
+  }
+
+  .turn-overview {
+    margin: 10px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .beach-container {
+    border-top: 5px solid #F1E8B8;
+    border-radius: 10px;
+    overflow-x: scroll;
+    justify-content: flex-start;
+    max-width: 1200px;
+  }
+
+  .sector {
+    padding: 10px;
+    width: 125px;
+    flex-shrink: 1;
+    flex-grow: 1;
+  }
+
+  .ranking-me, .ranking-others {
+    width: 85%;
+    height: 28%;
+    font-size: 18px;
+  }
 }

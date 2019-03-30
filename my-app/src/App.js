@@ -9,11 +9,12 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentTurn: this.shuffle(['John', 'You', 'Mark']),
+      currentTurn: ['John', 'Mark', 'You'],
       currentBeach: this.createBeachSectors(),
       placedShops: {Mark: 1, John: 2},
       incomeHistory: [],
-      nextTurn: false
+      nextTurn: false,
+      buttonBlocked: false,
     }
     this.nextTurn = this.nextTurn.bind(this);
     this.assignPlayerShop = this.assignPlayerShop.bind(this);
@@ -23,30 +24,35 @@ class App extends Component {
     this.setState({nextTurn: true}, this.continueTurn)
   }
 
-  countIncome() {
+  countIncome(shopsConfig) {
     let incomeList = [];
     for (let i = 0; i < this.state.currentBeach.length; i++) {
       let distances = [];
-      for (let player in this.state.placedShops) {
-        const distanceToShop = Math.abs((i + 1) - this.state.placedShops[player]);
+      for (let player in shopsConfig) {
+        const distanceToShop = Math.abs((i + 1) - shopsConfig[player]);
         distances.push({
           player: player,
           distanceToShop: distanceToShop
         });
       }
-      let closest = {
+      let closest = [{
         distanceToShop: undefined,
         player: undefined
-      };
+      }];
       for (let distance of distances) {
-        if (distance.distanceToShop < closest.distanceToShop || closest.distanceToShop === undefined) {
-          closest = distance;
+        if (distance.distanceToShop < closest[0].distanceToShop || closest[0].distanceToShop === undefined) {
+          closest = [distance];
+        } else if (distance.distanceToShop === closest[0].distanceToShop) {
+          closest.push(distance)
         }
       }
-      incomeList.push({
-        player: closest.player,
-        income: this.state.currentBeach[i]
-      });
+      const income = Math.floor(this.state.currentBeach[i] / closest.length)
+      for (let winner of closest) {
+        incomeList.push({
+          player: winner.player,
+          income: income
+        })
+      }
     }
     return incomeList;
   }
@@ -73,8 +79,33 @@ class App extends Component {
   }
 
   computerMakeTurn(player) {
-    let randomSector= Math.floor(Math.random() * this.state.currentBeach.length + 1);
-    this.placeShop(randomSector, player)
+    let bestIncome = 0;
+    let bestSector;
+    if (this.state.currentTurn.indexOf(player) != 2) {
+      let beach = this.state.currentBeach.slice(0)
+      for (let shop in this.state.placedShops) {
+        beach[this.state.placedShops[shop] - 1] = 0;
+      }
+      let highestNumOfCustomers = Math.max(...beach);
+      bestSector = this.state.currentBeach.indexOf(highestNumOfCustomers) + 1;
+    } else {
+      let shopsConfig = Object.assign({}, this.state.placedShops);
+      for (let i = 0; i < this.state.currentBeach.length; i++) {
+        shopsConfig[player] = i + 1;
+        let currentIncomeList = this.countIncome(shopsConfig);
+        let currentIncome = 0;
+        for (let sector of currentIncomeList) {
+          if (sector.player === player) {
+            currentIncome += sector.income;
+          }
+        }
+        if (currentIncome >= bestIncome) {
+          bestIncome = currentIncome;
+          bestSector = i + 1;
+        }
+      }
+    }
+    this.placeShop(bestSector, player)
   }
   
   shuffle(a) {
@@ -100,17 +131,23 @@ class App extends Component {
   componentDidUpdate() {
     if (this.state.nextTurn &&
     Object.keys(this.state.placedShops).length === this.state.currentTurn.length) {
-      console.log('boom')
-      const income = this.countIncome();
-      const newIncomeHistory = this.state.incomeHistory;
+      const income = this.countIncome(this.state.placedShops);
+      const newIncomeHistory = this.state.incomeHistory.slice(0, this.state.incomeHistory.length);
       newIncomeHistory.push(income);
+      // setState -> setTimeout as callback -> setState -> setState as callback
+      // To give 500 ms before the next turn is started
       this.setState({
-        currentTurn: this.shuffle(['John', 'You', 'Mark']),
-        currentBeach: this.createBeachSectors(),
-        placedShops: {},
-        incomeHistory: newIncomeHistory,
-        nextTurn: false
-      }, this.continueTurn);
+        nextTurn: false,
+        buttonBlocked: true
+      }, () => setTimeout(() => {
+        this.setState({
+          currentTurn: this.shuffle(['John', 'You', 'Mark']),
+          currentBeach: this.createBeachSectors(),
+          placedShops: {},
+          incomeHistory: newIncomeHistory,
+          buttonBlocked: false
+        }, this.continueTurn);
+      }, 750));
     }
   }
 
@@ -131,10 +168,10 @@ class App extends Component {
       <section className='App-grid'>
         <Belt/>
         <Ranking ranking={players}/>
-        <TurnOverview sequence={this.state.currentTurn}/>
-        <TurnButton handleClick={this.nextTurn} myShopPlaced={('You' in this.state.placedShops)}/>
+        <TurnOverview placedShops={this.state.placedShops} sequence={this.state.currentTurn}/>
+        <TurnButton buttonBlocked={this.state.buttonBlocked} handleClick={this.nextTurn} myShopPlaced={('You' in this.state.placedShops)}/>
         <Chart/>
-        <Beach handleClick={this.assignPlayerShop} placedShops={this.state.placedShops} sectors={this.state.currentBeach}/>
+        <Beach buttonDisabled={this.state.buttonBlocked} handleClick={this.assignPlayerShop} placedShops={this.state.placedShops} sectors={this.state.currentBeach}/>
       </section>
     );
   }
@@ -177,9 +214,17 @@ function TurnOverview(props) {
   return (
     <ul className='turn-overview'>
       {props.sequence.map((player) =>
-      <li key={player} className='player-turn-container'>
-        <p className={isMyName(player)}>{player}</p>
-        <img src={isMyShop(player)} />
+      <li key={player} className={'player-turn-container ' + isMyName(player)}>
+        <p>{player}</p>
+        {(player in props.placedShops) &&
+        <React.Fragment>
+          <p className='placed-shop-number'>{props.placedShops[player]}</p>
+          <img className='placed-shop-image' src={isMyShop(player)} />
+        </React.Fragment>
+        }
+        {!(player in props.placedShops) &&
+          <img src={isMyShop(player)} />
+        }
       </li>
       )}
     </ul>
@@ -200,7 +245,7 @@ function TurnOverview(props) {
 }
 
 function TurnButton(props) {
-  if (props.myShopPlaced) {
+  if (props.myShopPlaced && !props.buttonBlocked) {
     return (
       <button onClick={props.handleClick} className='turn-button'>End turn</button>
     )
@@ -223,7 +268,7 @@ function Beach(props) {
     <div className='beach-container'>
       <img className='beach-image' src={beachImage}/>
       {props.sectors.map((customers) =>
-        <Sector placedShops={props.placedShops} handleClick={props.handleClick} customers={customers} number={counter += 1}/>
+        <Sector buttonDisabled={props.buttonDisabled} placedShops={props.placedShops} handleClick={props.handleClick} customers={customers} number={counter += 1}/>
       )}
     </div>
   )
@@ -231,22 +276,25 @@ function Beach(props) {
 
 function Sector(props) {
   return (
-    <button data-num={props.number} className={isMyShop(props.number)} onClick={props.handleClick}>
+    <button data-num={props.number} disabled={props.buttonDisabled} className={isMyShop(props.number)} onClick={props.handleClick}>
       <p>{props.number}</p>
-      {isThereShop(props.number) &&
-        <img src={shopImagewWite} />
-      }
+      {isThereShop(props.number)}
       <p>{props.customers}</p>
     </button>
   )
 
   function isThereShop(sector) {
+    let counter = 0;
     for (let owner in props.placedShops) {
       if (props.placedShops[owner] == sector) {
-        return true;
+        counter++;
       }
     }
-    return false;
+    if (counter === 1) {
+      return <img src={shopImagewWite} />
+    } else if (counter > 1) {
+      return <p>Contested</p>
+    }
   }
 
   function isMyShop(sector) {
