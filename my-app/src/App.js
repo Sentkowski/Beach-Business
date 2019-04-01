@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
+import '../node_modules/react-vis/dist/style.css';
+import {XYPlot, LineMarkSeries} from 'react-vis';
 import shopImageRed from './shop-image-red.svg';
 import shopImageBlue from './shop-image-blue.svg';
 import shopImagewWite from './shop-image-white.svg';
@@ -135,7 +137,7 @@ class App extends Component {
       const newIncomeHistory = this.state.incomeHistory.slice(0, this.state.incomeHistory.length);
       newIncomeHistory.push(income);
       // setState -> setTimeout as callback -> setState -> setState as callback
-      // To give 500 ms before the next turn is started
+      // To give a break before the next turn is started
       this.setState({
         nextTurn: false,
         buttonBlocked: true
@@ -147,7 +149,7 @@ class App extends Component {
           incomeHistory: newIncomeHistory,
           buttonBlocked: false
         }, this.continueTurn);
-      }, 750));
+      }, 2000));
     }
   }
 
@@ -162,17 +164,20 @@ class App extends Component {
         }
       }
     }
-    players.sort((a, b) => b.money - a.money)
+    players.sort((a, b) => b.money - a.money);
 
     return (
-      <section className='App-grid'>
-        <Belt/>
-        <Ranking ranking={players}/>
-        <TurnOverview placedShops={this.state.placedShops} sequence={this.state.currentTurn}/>
-        <TurnButton buttonBlocked={this.state.buttonBlocked} handleClick={this.nextTurn} myShopPlaced={('You' in this.state.placedShops)}/>
-        <Chart/>
-        <Beach buttonDisabled={this.state.buttonBlocked} handleClick={this.assignPlayerShop} placedShops={this.state.placedShops} sectors={this.state.currentBeach}/>
-      </section>
+      <React.Fragment>
+        <Message beach={this.state.currentBeach} placedShops={this.state.placedShops} shoudlRender={this.state.buttonBlocked} className='message-container'/>
+        <section className='App-grid'>
+          <Belt/>
+          <Ranking ranking={players}/>
+          <TurnOverview placedShops={this.state.placedShops} sequence={this.state.currentTurn}/>
+          <TurnButton buttonBlocked={this.state.buttonBlocked} handleClick={this.nextTurn} myShopPlaced={('You' in this.state.placedShops)}/>
+          <Chart incomeHistory={this.state.incomeHistory}/>
+          <Beach buttonDisabled={this.state.buttonBlocked} handleClick={this.assignPlayerShop} placedShops={this.state.placedShops} sectors={this.state.currentBeach}/>
+        </section>
+      </React.Fragment>
     );
   }
 }
@@ -256,10 +261,47 @@ function TurnButton(props) {
   }
 }
 
-function Chart() {
+function Chart(props) {
+  let height = 0;
+  let width = 0;
+  if (document.querySelector('.chart')) {
+    height = document.querySelector('.chart').offsetHeight - 15;
+    width = document.querySelector('.chart').offsetWidth - 15;
+  }
+  console.log(generatePointHistory(props.incomeHistory, 'You'))
+
   return (
-    <div className='chart'/>
+    <div className='chart'>
+      <XYPlot margin={10} height={height} width={width}>
+        <LineMarkSeries color={'#FF6666'} data={generatePointHistory(props.incomeHistory, 'Mark')}/>
+        <LineMarkSeries color={'#FF6666'} data={generatePointHistory(props.incomeHistory, 'John')}/>
+        <LineMarkSeries color={'#2EC4B6'} data={generatePointHistory(props.incomeHistory, 'You')}/>
+      </XYPlot>
+    </div>
   )
+
+  function generatePointHistory(incomeHistory, player) {
+    if (incomeHistory.length == 0) {
+      return;
+    }
+    let points = [{x: 0, y: 0}];
+    for (let i = 0; i < incomeHistory.length; i++) {
+      let turnInc = sumIncome(incomeHistory[i], player);
+      let sumSoFar = points[i].y + turnInc;
+      points.push({x: i + 1, y: sumSoFar})
+    }
+    return points;
+  }
+
+  function sumIncome(incomeList, player) {
+    let income = 0;
+    for (let sector of incomeList) {
+      if (sector.player === player) {
+        income += sector.income;
+      }
+    }
+    return income;
+  }
 }
 
 function Beach(props) {
@@ -307,6 +349,78 @@ function Sector(props) {
       return 'computers sector';
     }
     return 'sector'
+  }
+}
+
+function Message(props) {
+  let incomeList = countIncome(props.placedShops, props.beach);
+  let players = [
+    {name:'John', money: sumIncome(incomeList, 'John')},
+    {name:'Mark', money: sumIncome(incomeList, 'Mark')},
+    {name:'You', money: sumIncome(incomeList, 'You')},
+  ];
+  players.sort((a, b) => b.money - a.money);
+  if (props.shoudlRender) {
+    return (
+      <ol className='income-message'>
+        <li className={isMyName(players[0].name)} key={players[0].name}>{players[0].name} +{players[0].money}$</li>
+        <li className={isMyName(players[1].name)} key={players[1].name}>{players[1].name} +{players[1].money}$</li>
+        <li className={isMyName(players[2].name)} key={players[2].name}>{players[2].name} +{players[2].money}$</li>
+      </ol>
+    )
+  } else {
+    return null;
+  }
+
+  function sumIncome(incomeList, player) {
+    let income = 0;
+    for (let sector of incomeList) {
+      if (sector.player === player) {
+        income += sector.income;
+      }
+    }
+    return income;
+  }
+
+  function isMyName(name) {
+    if (name === 'You') {
+      return 'my turn-result';
+    } else {
+      return 'others turn-result';
+    }
+  }
+
+  function countIncome(shopsConfig, beach) {
+    let incomeList = [];
+    for (let i = 0; i < beach.length; i++) {
+      let distances = [];
+      for (let player in shopsConfig) {
+        const distanceToShop = Math.abs((i + 1) - shopsConfig[player]);
+        distances.push({
+          player: player,
+          distanceToShop: distanceToShop
+        });
+      }
+      let closest = [{
+        distanceToShop: undefined,
+        player: undefined
+      }];
+      for (let distance of distances) {
+        if (distance.distanceToShop < closest[0].distanceToShop || closest[0].distanceToShop === undefined) {
+          closest = [distance];
+        } else if (distance.distanceToShop === closest[0].distanceToShop) {
+          closest.push(distance)
+        }
+      }
+      const income = Math.floor(beach[i] / closest.length)
+      for (let winner of closest) {
+        incomeList.push({
+          player: winner.player,
+          income: income
+        })
+      }
+    }
+    return incomeList;
   }
 }
 
