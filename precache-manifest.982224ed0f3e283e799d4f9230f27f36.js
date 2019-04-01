@@ -20,19 +20,23 @@ self.__precacheManifest = [
     "url": "/UI-Beach/static/js/runtime~main.5265e7dd.js"
   },
   {
-    "revision": "fe6bed1e9d00280cffd4",
-    "url": "/UI-Beach/static/js/main.cd7786fd.chunk.js"
+    "revision": "e14e058e10ba82bbcf91",
+    "url": "/UI-Beach/static/js/main.d198cac0.chunk.js"
   },
   {
-    "revision": "6f0318e6ae55755b4b2c",
-    "url": "/UI-Beach/static/js/2.2aa3cefc.chunk.js"
+    "revision": "4363f9eaaa4770d4dc44",
+    "url": "/UI-Beach/static/js/2.8b04b1ed.chunk.js"
   },
   {
-    "revision": "fe6bed1e9d00280cffd4",
-    "url": "/UI-Beach/static/css/main.2ed2693a.chunk.css"
+    "revision": "e14e058e10ba82bbcf91",
+    "url": "/UI-Beach/static/css/main.c78e5c49.chunk.css"
   },
   {
-    "revision": "8e0039c9d45b9fab584e1ca8a2c48e3e",
+    "revision": "4363f9eaaa4770d4dc44",
+    "url": "/UI-Beach/static/css/2.1ac49ab1.chunk.css"
+  },
+  {
+    "revision": "3b4ca5ded53361ef6e74004dbd29469e",
     "url": "/UI-Beach/index.html"
   }
 ];
