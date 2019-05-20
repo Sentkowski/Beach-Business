@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/UI-Beach/precache-manifest.982224ed0f3e283e799d4f9230f27f36.js"
+  "/Beach-Business/precache-manifest.569ffa43fd91c92cae4a0a15a52c3da0.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/UI-Beach/index.html", {
+workbox.routing.registerNavigationRoute("/Beach-Business/index.html", {
   
   blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });
