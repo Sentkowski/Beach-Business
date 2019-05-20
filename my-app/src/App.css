@@ -1,3 +1,10 @@
+body {
+	max-width: 100vw;
+	max-height: 100vh;
+	overflow: hidden;
+  font-family: "Roboto", sans-serif;
+}
+
 .App-grid {
   overflow: hidden;
   width: 100vw;
@@ -10,6 +17,54 @@
     'chart chart  ranking'
     'turns button ranking'
     'beach beach  beach';
+}
+
+.introduction-section {
+  z-index: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 250px;
+  width: 80%;
+  max-width: 500px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFFEE;
+  border: 2px solid #FF6666;
+  padding: 10px;
+  animation: appear 0.5s 0.5s forwards;
+  opacity: 0;
+}
+
+.introduction-text {
+  font-size: 16px;
+  width: 80%;
+  align-self: center;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.introduction-important {
+  font-weight: bold;
+}
+
+.introduction-close-button {
+  align-self: center;
+  width: 100px;
+  border: none;
+  background-color: #2EC4B6;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 22px;
+  font-variant: small-caps;
+  cursor: pointer;
+}
+
+@keyframes appear {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
 
 .nav-belt {

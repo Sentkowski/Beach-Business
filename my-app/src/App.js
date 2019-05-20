@@ -12,11 +12,12 @@ class App extends Component {
     super(props);
     this.state = {
       currentTurn: ['John', 'Mark', 'You'],
-      currentBeach: this.createBeachSectors(),
+      currentBeach: [50, 50, 50, 50],
       placedShops: {Mark: 1, John: 2},
       incomeHistory: [],
       nextTurn: false,
       buttonBlocked: false,
+      showIntroduction: true
     }
     this.nextTurn = this.nextTurn.bind(this);
     this.assignPlayerShop = this.assignPlayerShop.bind(this);
@@ -88,8 +89,7 @@ class App extends Component {
       for (let shop in this.state.placedShops) {
         beach[this.state.placedShops[shop] - 1] = 0;
       }
-      let highestNumOfCustomers = Math.max(...beach);
-      bestSector = this.state.currentBeach.indexOf(highestNumOfCustomers) + 1;
+      bestSector = beach.indexOf(Math.max(...beach)) + 1;
     } else {
       let shopsConfig = Object.assign({}, this.state.placedShops);
       for (let i = 0; i < this.state.currentBeach.length; i++) {
@@ -130,6 +130,10 @@ class App extends Component {
     return sectorsArray;
   }
 
+  hideIntroduction = () => {
+    this.setState({showIntroduction: false});
+  }
+
   componentDidUpdate() {
     if (this.state.nextTurn &&
     Object.keys(this.state.placedShops).length === this.state.currentTurn.length) {
@@ -168,6 +172,7 @@ class App extends Component {
 
     return (
       <React.Fragment>
+        <Introduction handleClick={this.hideIntroduction} showIntroduction={this.state.showIntroduction} />
         <Message beach={this.state.currentBeach} placedShops={this.state.placedShops} shoudlRender={this.state.buttonBlocked} className='message-container'/>
         <section className='App-grid'>
           <Belt/>
@@ -179,6 +184,22 @@ class App extends Component {
         </section>
       </React.Fragment>
     );
+  }
+}
+
+function Introduction(props) {
+  if (props.showIntroduction) {
+    return (
+      <section className="introduction-section">
+        <p className='introduction-text'>You travel the world selling snacks on every possible beach. The problem is that John and Mark are doing the same!</p>
+        <p className='introduction-text'>Sometimes you are the first on the spot, sometimes it is Mark or John. Place your shop to attract as many customers as you can.</p>
+        <p className='introduction-text'><strong className="introduction-important">Customers are lazy and visit the closest store. If there are a few shops equally near – profit is divided.</strong></p>
+        <p className='introduction-text'><strong className="introduction-important">NOTE: The number of customers is at the bottom of every beach sector.</strong></p>
+        <button onClick={props.handleClick} className='introduction-close-button'>Got it</button>
+      </section>
+    )
+  } else {
+    return null;
   }
 }
 
@@ -224,11 +245,11 @@ function TurnOverview(props) {
         {(player in props.placedShops) &&
         <React.Fragment>
           <p className='placed-shop-number'>{props.placedShops[player]}</p>
-          <img className='placed-shop-image' src={isMyShop(player)} />
+          <img className='placed-shop-image' alt="An icon of a shop." src={isMyShop(player)} />
         </React.Fragment>
         }
         {!(player in props.placedShops) &&
-          <img src={isMyShop(player)} />
+          <img alt="An icon of a shop." src={isMyShop(player)} />
         }
       </li>
       )}
@@ -268,7 +289,6 @@ function Chart(props) {
     height = document.querySelector('.chart').offsetHeight - 15;
     width = document.querySelector('.chart').offsetWidth - 15;
   }
-  console.log(generatePointHistory(props.incomeHistory, 'You'))
 
   return (
     <div className='chart'>
@@ -308,7 +328,7 @@ function Beach(props) {
   let counter = 0;
   return (
     <div className='beach-container'>
-      <img className='beach-image' src={beachImage}/>
+      <img alt="A beach line." className='beach-image' src={beachImage}/>
       {props.sectors.map((customers) =>
         <Sector buttonDisabled={props.buttonDisabled} placedShops={props.placedShops} handleClick={props.handleClick} customers={customers} number={counter += 1}/>
       )}
@@ -333,7 +353,7 @@ function Sector(props) {
       }
     }
     if (counter === 1) {
-      return <img src={shopImagewWite} />
+      return <img alt="An icon of a shop." src={shopImagewWite} />
     } else if (counter > 1) {
       return <p>Contested</p>
     }
