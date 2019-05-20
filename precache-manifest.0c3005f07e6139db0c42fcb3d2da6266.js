@@ -36,7 +36,7 @@ self.__precacheManifest = [
     "url": "/Beach-Business/static/css/2.7aeb3315.chunk.css"
   },
   {
-    "revision": "5288ad7c6acbf9b695ed02be7359c7ff",
+    "revision": "f1dcaffdac6de4a69a81815ce416c265",
     "url": "/Beach-Business/index.html"
   }
 ];

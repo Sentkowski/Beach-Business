@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/Beach-Business/precache-manifest.569ffa43fd91c92cae4a0a15a52c3da0.js"
+  "/Beach-Business/precache-manifest.0c3005f07e6139db0c42fcb3d2da6266.js"
 );
 
 workbox.clientsClaim();
